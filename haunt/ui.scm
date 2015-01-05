@@ -24,12 +24,29 @@
 
 (define-module (haunt ui)
   #:use-module (ice-9 format)
+  #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
-  #:export (haunt-main))
+  #:use-module (srfi srfi-26)
+  #:export (program-name
+            haunt-error
+            option?
+            haunt-main))
+
+(define commands
+  '(serve))
+
+(define program-name (make-parameter "haunt"))
+
+(define (haunt-error str . args)
+  (format (current-error-port) "~a: " (program-name))
+  (apply format (current-error-port) str args)
+  (newline))
 
 (define (show-haunt-help)
   (format #t "Usage: haunt COMMAND ARGS...
-Run COMMAND with ARGS.~%~%"))
+Run COMMAND with ARGS.~%~%")
+  (format #t "COMMAND must be one of the sub-commands listed below:~%~%")
+  (format #t "~{   ~a~%~}" (sort commands string<?)))
 
 (define (show-haunt-usage)
   (format #t "Try `haunt --help' for more information.~%")
@@ -37,6 +54,18 @@ Run COMMAND with ARGS.~%~%"))
 
 (define (option? str)
   (string-prefix? "-" str))
+
+(define (run-haunt-command command . args)
+  (let* ((module
+          (catch 'misc-error
+            (lambda ()
+              (resolve-interface `(haunt ui ,command)))
+            (lambda -
+              (haunt-error "~a: command not found" command)
+              (show-haunt-usage))))
+         (command-main (module-ref module (symbol-append 'haunt- command))))
+    (parameterize ((program-name command))
+      (apply command-main args))))
 
 (define* (haunt-main arg0 . args)
   (match args
@@ -48,4 +77,6 @@ Run COMMAND with ARGS.~%~%"))
      (format (current-error-port)
              "haunt: unrecognized option '~a'~%"
              opt)
-     (show-haunt-usage))))
+     (show-haunt-usage))
+    ((command args ...)
+     (apply run-haunt-command (string->symbol command) args))))

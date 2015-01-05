@@ -40,6 +40,10 @@ moddir=$(prefix)/share/guile/site/2.0
 godir=$(libdir)/guile/2.0/ccache
 
 SOURCES =					\
-  haunt/ui.scm
+  haunt/config.scm				\
+  haunt/ui.scm					\
+  haunt/ui/serve.scm				\
+  haunt/serve/mime-types.scm			\
+  haunt/serve/web-server.scm
 
 EXTRA_DIST += pre-inst-env.in
