@@ -9,7 +9,7 @@
 ;;; (at your option) any later version.
 ;;;
 ;;; Haunt is distributed in the hope that it will be useful, but
-;;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; WITnnnHOUT ANY WARRANTY; without even the implied warranty of
 ;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ;;; General Public License for more details.
 ;;;
@@ -27,15 +27,17 @@
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-26)
+  #:use-module (haunt config)
   #:export (program-name
             haunt-error
+            show-version-and-exit
             option?
             haunt-main))
 
 (define commands
   '(serve))
 
-(define program-name (make-parameter "haunt"))
+(define program-name (make-parameter 'haunt))
 
 (define (haunt-error str . args)
   (format (current-error-port) "~a: " (program-name))
@@ -51,6 +53,17 @@ Run COMMAND with ARGS.~%~%")
 (define (show-haunt-usage)
   (format #t "Try `haunt --help' for more information.~%")
   (exit 1))
+
+(define (show-version-and-exit)
+  (let ((name (if (eq? (program-name) 'haunt)
+                  "haunt"
+                  (format #f "haunt ~a" (program-name)))))
+    (format #t "~a ~a
+Copyright (C) 2015 the Haunt authors
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.~%"
+            name %haunt-version)))
 
 (define (option? str)
   (string-prefix? "-" str))
@@ -73,6 +86,8 @@ Run COMMAND with ARGS.~%~%")
      (show-haunt-usage))
     ((or ("-h") ("--help"))
      (show-haunt-help))
+    (("--version")
+     (show-version-and-exit))
     (((? option? opt) _ ...)
      (format (current-error-port)
              "haunt: unrecognized option '~a'~%"

@@ -23,9 +23,12 @@
 ;;; Code:
 
 (define-module (haunt config)
-  #:export (%haunt-cwd
+  #:export (%haunt-version
+            %haunt-cwd
             haunt-file-name
             haunt-output-directory))
+
+(define %haunt-version "@PACKAGE_VERSION@")
 
 (define %haunt-cwd (getcwd))
 

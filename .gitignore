@@ -10,3 +10,4 @@
 *.go
 *~
 .#*
+/haunt/config.scm
