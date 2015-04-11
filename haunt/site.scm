@@ -24,6 +24,10 @@
 
 (define-module (haunt site)
   #:use-module (srfi srfi-9)
+  #:use-module (srfi srfi-26)
+  #:use-module (haunt utils)
+  #:use-module (haunt reader)
+  #:use-module (haunt page)
   #:export (site
             site?
             site-title
@@ -31,7 +35,8 @@
             site-build-directory
             site-default-metadata
             site-readers
-            site-builders))
+            site-builders
+            build-site))
 
 (define-record-type <site>
   (make-site title posts-directory build-directory default-metadata
@@ -62,3 +67,16 @@ READERS: A list of reader objects for processing posts
 BUILDERS: A list of procedures for building pages from posts"
   (make-site title posts-directory build-directory
              default-metadata readers builders))
+
+(define (build-site site)
+  "Build SITE in the appropriate build directory."
+  (let ((posts (read-posts (site-posts-directory site)
+                           (site-readers site)
+                           (site-default-metadata site)))
+        (build-dir (absolute-file-name (site-build-directory site))))
+    (clean-directory build-dir)
+    (for-each (lambda (page)
+                (format #t "writing ~a" (page-file-name page))
+                (write-page page build-dir)
+                (format #t " ✓~%"))
+              (flat-map (cut <> site posts) (site-builders site)))))

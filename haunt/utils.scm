@@ -29,7 +29,9 @@
   #:use-module (srfi srfi-26)
   #:export (flatten
             flat-map
-            string-split-at))
+            string-split-at
+            absolute-file-name
+            clean-directory))
 
 (define* (flatten lst #:optional depth)
   "Return a list that recursively concatenates the sub-lists of LST,
@@ -56,3 +58,15 @@ flattened."
               (string-drop str (1+ i)))
         (list str))))
 
+(define (absolute-file-name file-name)
+  (if (absolute-file-name? file-name)
+      file-name
+      (string-append (getcwd) "/" file-name)))
+
+(define (clean-directory dir)
+  (define (delete-other-files file-name stat flag)
+    (unless (string=? dir file-name)
+      (delete-file file-name))
+    #t)
+
+  (ftw dir delete-other-files))
