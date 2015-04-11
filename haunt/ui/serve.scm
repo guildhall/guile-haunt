@@ -23,29 +23,48 @@
 ;;; Code:
 
 (define-module (haunt ui serve)
+  #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-37)
   #:use-module (ice-9 match)
+  #:use-module (ice-9 format)
   #:use-module (haunt config)
   #:use-module (haunt ui)
   #:use-module (haunt serve web-server)
   #:export (haunt-serve))
 
-(define (show-serve-help)
+(define (show-help)
   (format #t "Usage: haunt serve [OPTION]
 Start an HTTP server for the current site.~%")
   (display "
+  -p, --port             port to listen on")
+  (newline)
+  (show-common-options-help)
+  (newline)
+  (display "
   -h, --help             display this help and exit")
+  (display "
+  -V, --version          display version and exit")
   (newline))
 
-(define haunt-serve
-  (match-lambda*
-   (() (serve (haunt-output-directory)))
-   ((or ("-h") ("--help"))
-    (show-serve-help))
-   (("--version")
-    (show-version-and-exit))
-   (((? option? opt) _ ...)
-    (haunt-error "invalid option: ~a" opt)
-    (exit 1))
-   ((arg _ ...)
-    (haunt-error "invalid argument: ~a" arg)
-    (exit 1))))
+(define %options
+  (cons* (option '(#\h "help") #f #f
+                 (lambda _
+                   (show-help)
+                   (exit 0)))
+         (option '(#\V "version") #f #f
+                 (lambda _
+                   (show-version-and-exit "haunt serve")))
+         (option '(#\p "port") #t #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'port (string->number* arg) result)))
+         %common-options))
+
+(define %default-options
+  (cons '((port . 8080))
+        %default-common-options))
+
+(define (haunt-serve . args)
+  (let* ((opts (simple-args-fold args %options %default-options))
+         (port (assoc-ref opts 'port)))
+    (format #t "serving ~a on port ~d~%" (haunt-output-directory) port)
+    (serve (haunt-output-directory))))
