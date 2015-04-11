@@ -31,6 +31,7 @@
   #:use-module (srfi srfi-37)
   #:use-module (haunt config)
   #:use-module (haunt site)
+  #:use-module (haunt utils)
   #:export (program-name
             show-version-and-exit
             simple-args-fold
@@ -104,11 +105,11 @@ There is NO WARRANTY, to the extent permitted by law.~%"
 (define* (load-config file-name)
   "Load configuration from FILE-NAME."
   (if (file-exists? file-name)
-      (let ((obj (load file-name)))
+      (let ((obj (load (absolute-file-name file-name))))
         (if (site? obj)
             obj
             (leave "configuration object must be a site, got: ~a" obj)))
-      (leave "configuration file found: ~a" file-name)))
+      (leave "configuration file not found: ~a" file-name)))
 
 (define (run-haunt-command command . args)
   (let* ((module
