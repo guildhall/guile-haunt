@@ -1,5 +1,6 @@
 ;;; Haunt --- Static site generator for GNU Guile
 ;;; Copyright © 2015 David Thompson <davet@gnu.org>
+;;; Copyright © 2012 Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of Haunt.
 ;;;
@@ -31,7 +32,8 @@
             flat-map
             string-split-at
             absolute-file-name
-            clean-directory))
+            clean-directory
+            mkdir-p))
 
 (define* (flatten lst #:optional depth)
   "Return a list that recursively concatenates the sub-lists of LST,
@@ -70,3 +72,29 @@ flattened."
     #t)
 
   (ftw dir delete-other-files))
+
+;; Written by Ludovic Courtès for GNU Guix.
+(define (mkdir-p dir)
+  "Create directory DIR and all its ancestors."
+  (define absolute?
+    (string-prefix? "/" dir))
+
+  (define not-slash
+    (char-set-complement (char-set #\/)))
+
+  (let loop ((components (string-tokenize dir not-slash))
+             (root       (if absolute?
+                             ""
+                             ".")))
+    (match components
+      ((head tail ...)
+       (let ((path (string-append root "/" head)))
+         (catch 'system-error
+           (lambda ()
+             (mkdir path)
+             (loop tail path))
+           (lambda args
+             (if (= EEXIST (system-error-errno args))
+                 (loop tail path)
+                 (apply throw args))))))
+      (() #t))))
