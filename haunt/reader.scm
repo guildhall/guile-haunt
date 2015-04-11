@@ -95,7 +95,7 @@ list must contain a matching reader for every post."
 (define sxml-reader
   (make-reader (make-file-extension-matcher "sxml")
                (lambda (file-name)
-                 (let ((contents (load file-name)))
+                 (let ((contents (load (absolute-file-name file-name))))
                    (values (alist-delete 'content contents eq?)
                            (assq-ref contents 'content))))))
 
