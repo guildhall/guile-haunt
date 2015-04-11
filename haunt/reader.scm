@@ -26,8 +26,12 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-11)
+  #:use-module (srfi srfi-26)
+  #:use-module (ice-9 match)
   #:use-module (ice-9 regex)
+  #:use-module (ice-9 rdelim)
   #:use-module (haunt post)
+  #:use-module (haunt utils)
   #:export (make-reader
             reader?
             reader-matcher
@@ -73,3 +77,22 @@ metadata with DEFAULT-METADATA."
                  (let ((contents (load file-name)))
                    (values (alist-delete 'content contents eq?)
                            (assq-ref contents 'content))))))
+
+(define (read-html-post port)
+  (let loop ((metadata '()))
+    (let ((line (read-line port)))
+      (cond
+       ((eof-object? line)
+        (error "end of file while reading metadata: " (port-filename port)))
+       ((string=? line "---")
+        (values metadata `(raw ,(read-string port))))
+       (else
+        (match (map string-trim-both (string-split-at line #\:))
+          ((key value)
+           (loop (cons (cons (string->symbol key) value)
+                       metadata)))
+          (_ (error "invalid metadata format: " line))))))))
+
+(define html-reader
+  (make-reader (make-file-extension-matcher "html")
+               (cut call-with-input-file <> read-html-post)))
