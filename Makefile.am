@@ -42,6 +42,7 @@ godir=$(libdir)/guile/2.0/ccache
 SOURCES =					\
   haunt/config.scm				\
   haunt/post.scm				\
+  haunt/reader.scm				\
   haunt/ui.scm					\
   haunt/ui/serve.scm				\
   haunt/serve/mime-types.scm			\
