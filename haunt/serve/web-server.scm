@@ -29,6 +29,7 @@
   #:use-module (ice-9 popen)
   #:use-module (ice-9 rdelim)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26)
   #:use-module (sxml simple)
   #:use-module (web server)
   #:use-module (web request)
@@ -66,6 +67,18 @@
 directory WORK-DIR."
   (string-append work-dir path))
 
+(define (request-path-components request)
+  "Split the URI path of REQUEST into a list of component strings.  For
+example: \"/foo/bar\" yields '(\"foo\" \"bar\")."
+  (split-and-decode-uri-path (uri-path (request-uri request))))
+
+(define (request-file-name request)
+  "Return the relative file name corresponding to the REQUEST URI."
+  (let ((components (request-path-components request)))
+    (if (null? components)
+        "/"
+        (string-join components "/" 'prefix))))
+
 (define (resolve-file-name file-name)
   "If FILE-NAME is a directory with an 'index.html' file,
 return that file name.  If FILE-NAME does not exist, return #f.
@@ -94,11 +107,19 @@ FILE-NAME."
 
 (define (render-directory path dir)
   "Render the contents of DIR represented by the URI PATH."
+  (define (concat+uri-encode . file-names)
+    "Concatenate FILE-NAMES, preserving the correct file separators."
+    (string-join (map uri-encode
+                      (remove string-null?
+                              (string-split (string-concatenate file-names)
+                                            #\/)))
+                 "/" 'prefix))
+
   (define render-child
     (match-lambda
      ((file-name directory?)
       `(li
-        (a (@ (href ,(string-append path "/" file-name)))
+        (a (@ (href ,(concat+uri-encode path file-name)))
            ,(if directory?
                 (string-append file-name "/")
                 file-name))))))
@@ -115,7 +136,6 @@ FILE-NAME."
                  (title ,title))
                 (body
                  (h1 ,title)
-                 (h2 "<i>foobar</i>")
                  (ul ,@(map render-child children))))))
     (values '((content-type . (text/html)))
             (lambda (port)
@@ -140,9 +160,10 @@ FILE-NAME."
 (define (make-handler work-dir)
   (lambda (request body)
     "Serve the file asked for in REQUEST."
-    (let ((path (uri-path (request-uri request))))
-      (format #t "~a ~a~%" (request-method request) path)
-      (serve-file work-dir path))))
+    (format #t "~a ~a~%"
+            (request-method request)
+            (uri-path (request-uri request)))
+    (serve-file work-dir (request-file-name request))))
 
 (define* (serve work-dir #:key (open-params '()))
   "Run a simple HTTP server that serves files in WORK-DIR."
