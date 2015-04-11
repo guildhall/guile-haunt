@@ -23,20 +23,6 @@
 ;;; Code:
 
 (define-module (haunt config)
-  #:export (%haunt-version
-            %haunt-cwd
-            haunt-file-name
-            haunt-output-directory))
+  #:export (%haunt-version))
 
 (define %haunt-version "@PACKAGE_VERSION@")
-
-(define %haunt-cwd (getcwd))
-
-(define (haunt-file-name rel)
-  "Return an absolute file name to the file REL in the haunt current
-working directory."
-  (string-append %haunt-cwd "/" rel))
-
-(define (haunt-output-directory)
-  "Return the current haunt compiled page output directory."
-  (haunt-file-name "output"))
