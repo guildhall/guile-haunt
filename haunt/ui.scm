@@ -116,7 +116,7 @@ There is NO WARRANTY, to the extent permitted by law.~%"
             (lambda ()
               (resolve-interface `(haunt ui ,command)))
             (lambda -
-              (haunt-error "~a: command not found" command)
+              (format (current-error-port) "~a: invalid subcommand~%" command)
               (show-haunt-usage))))
          (command-main (module-ref module (symbol-append 'haunt- command))))
     (parameterize ((program-name command))
