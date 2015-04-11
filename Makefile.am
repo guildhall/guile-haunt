@@ -43,6 +43,7 @@ SOURCES =					\
   haunt/config.scm				\
   haunt/post.scm				\
   haunt/reader.scm				\
+  haunt/page.scm				\
   haunt/ui.scm					\
   haunt/ui/serve.scm				\
   haunt/serve/mime-types.scm			\
