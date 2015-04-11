@@ -1,4 +1,4 @@
-n;;; Haunt --- Static site generator for GNU Guile
+;;; Haunt --- Static site generator for GNU Guile
 ;;; Copyright © 2015 David Thompson <davet@gnu.org>
 ;;;
 ;;; This file is part of Haunt.
