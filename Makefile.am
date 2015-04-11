@@ -48,6 +48,7 @@ SOURCES =					\
   haunt/site.scm				\
   haunt/build/html.scm				\
   haunt/ui.scm					\
+  haunt/ui/build.scm				\
   haunt/ui/serve.scm				\
   haunt/serve/mime-types.scm			\
   haunt/serve/web-server.scm
