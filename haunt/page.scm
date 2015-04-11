@@ -35,15 +35,15 @@
             write-page))
 
 (define-record-type <page>
-  (make-page file-name sxml writer)
+  (make-page file-name contents writer)
   page?
   (file-name page-file-name)
-  (sxml page-sxml)
+  (contents page-contents)
   (writer page-writer))
 
 (define (write-page page output-directory)
   "Write PAGE to OUTPUT-DIRECTORY."
   (match page
-    (($ <page> file-name sxml writer)
+    (($ <page> file-name contents writer)
      (let ((output (string-append output-directory "/" file-name)))
-       (call-with-output-file output (cut writer sxml <>))))))
+       (call-with-output-file output (cut writer contents <>))))))
