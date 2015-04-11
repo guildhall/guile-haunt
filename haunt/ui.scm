@@ -45,7 +45,7 @@
             haunt-main))
 
 (define commands
-  '("serve"))
+  '("build" "serve"))
 
 (define program-name (make-parameter 'haunt))
 
