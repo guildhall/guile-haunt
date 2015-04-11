@@ -27,6 +27,7 @@
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-11)
   #:use-module (srfi srfi-26)
+  #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
   #:use-module (ice-9 regex)
   #:use-module (ice-9 rdelim)
@@ -38,6 +39,7 @@
             reader-proc
             reader-match?
             read-post
+            read-posts
 
             make-file-extension-matcher
             sxml-reader))
@@ -59,6 +61,25 @@ metadata with DEFAULT-METADATA."
     (make-post file-name
                (append metadata default-metadata)
                sxml)))
+
+(define* (read-posts directory readers #:optional (default-metadata '()))
+  "Read all of the files in DIRECTORY as post objects.  The READERS
+list must contain a matching reader for every post."
+  (define enter? (const #t))
+
+  (define (leaf file-name stat memo)
+    (let ((reader (find (cut reader-match? <> file-name) readers)))
+      (if reader
+          (cons (read-post reader file-name default-metadata) memo)
+          (error "no reader available for post: " file-name))))
+
+  (define (noop file-name stat result)
+    result)
+
+  (define (err file-name stat errno result)
+    (error "file processing failed with errno: " file-name errno))
+
+  (file-system-fold enter? leaf noop noop noop err '() directory))
 
 ;;;
 ;;; Simple readers
