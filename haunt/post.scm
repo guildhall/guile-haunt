@@ -24,12 +24,15 @@
 
 (define-module (haunt post)
   #:use-module (srfi srfi-9)
+  #:use-module (srfi srfi-19)
   #:export (make-post
             post?
             post-file-name
             post-sxml
             post-metadata
-            post-ref))
+            post-ref
+            post-slug
+            posts/reverse-chronological))
 
 (define-record-type <post>
   (make-post file-name metadata sxml)
@@ -41,3 +44,20 @@
 (define (post-ref post key)
   "Return the metadata corresponding to KEY within POST."
   (assq-ref (post-metadata post) key))
+
+(define (post-slug post)
+  "Transform the title of POST into a URL slug."
+  (string-join (map (lambda (s)
+                      (string-filter char-set:letter+digit s))
+                    (string-split (string-downcase (post-ref post 'title))
+                                  char-set:whitespace))
+               "-"))
+
+(define (post->time post)
+  (date->time-utc (post-ref post 'date)))
+
+(define (posts/reverse-chronological posts)
+  "Returns POSTS sorted in reverse chronological order."
+  (sort posts
+        (lambda (a b)
+          (time>? (post->time a) (post->time b)))))
