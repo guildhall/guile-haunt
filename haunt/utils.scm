@@ -27,13 +27,15 @@
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-19)
   #:use-module (srfi srfi-26)
   #:export (flatten
             flat-map
             string-split-at
             absolute-file-name
             clean-directory
-            mkdir-p))
+            mkdir-p
+            string->date*
 
 (define* (flatten lst #:optional depth)
   "Return a list that recursively concatenates the sub-lists of LST,
@@ -98,3 +100,8 @@ flattened."
                  (loop tail path)
                  (apply throw args))))))
       (() #t))))
+
+(define (string->date* str)
+  "Convert STR, a string in '~Y~m~d ~H:~M' format, into a SRFI-19 date
+object."
+  (string->date str "~Y~m~d ~H:~M"))
