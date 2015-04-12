@@ -4,17 +4,51 @@ Haunt
 About
 -----
 
-Haunt is a static site generator written in Guile Scheme.
+Haunt is a static site generator written in Guile Scheme.  It's
+simple, functional, and extensible.
 
 Features
 --------
 
-* SXML templates
+* Easy blog and Atom feed generation
+* Supports any markup language that can be parsed to SXML
 * Simple development server
-* Easy deployment
-* Extensible
+* Purely functional build process
+* User extensible
+
+Example Configuration
+---------------------
+
+```
+(use-modules (haunt site)
+             (haunt reader)
+             (haunt builder blog)
+             (haunt builder atom)
+             (srfi srfi-19))
+
+(site #:title "Built with Guile"
+      #:domain "dthompson.us"
+      #:default-metadata
+      '((author . "David Thompson")
+        (email  . "davet@gnu.org")
+        ;; If I'm careless and forget a date, use the UNIX epoch.
+        (date   . (make-date 0 0 0 0 1 1 1970)))
+      #:readers (list sxml-reader html-reader)
+      #:builders (list (blog)
+                       (atom-feed)
+                       (atom-feeds-by-tag)))
+```
+
+Usage
+-----
+
+Write a configuration file named `haunt.scm`.  Add your posts to a
+directory named `posts`.  Then run `haunt build`!
+
+To view your creation, run `haunt serve` and browse to
+`localhost:8080`.
 
 License
 -------
 
-GNU GPLv3
+GNU GPLv3 or later
