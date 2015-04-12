@@ -42,7 +42,8 @@
             read-posts
 
             make-file-extension-matcher
-            sxml-reader))
+            sxml-reader
+            html-reader))
 
 (define-record-type <reader>
   (make-reader matcher proc)
@@ -109,9 +110,8 @@ list must contain a matching reader for every post."
         (values metadata `(raw ,(read-string port))))
        (else
         (match (map string-trim-both (string-split-at line #\:))
-          ((key value)
-           (loop (cons (cons (string->symbol key) value)
-                       metadata)))
+          (((= string->symbol key) value)
+           (loop (alist-cons key (parse-metadata key value) metadata)))
           (_ (error "invalid metadata format: " line))))))))
 
 (define html-reader
