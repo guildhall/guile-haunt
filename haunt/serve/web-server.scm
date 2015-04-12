@@ -35,6 +35,7 @@
   #:use-module (web request)
   #:use-module (web response)
   #:use-module (web uri)
+  #:use-module (haunt utils)
   #:use-module (haunt serve mime-types)
   #:export (serve))
 
@@ -111,8 +112,7 @@ FILE-NAME."
     "Concatenate FILE-NAMES, preserving the correct file separators."
     (string-join (map uri-encode
                       (remove string-null?
-                              (string-split (string-concatenate file-names)
-                                            #\/)))
+                              (flat-map (cut string-split <> #\/) file-names)))
                  "/" 'prefix))
 
   (define render-child
