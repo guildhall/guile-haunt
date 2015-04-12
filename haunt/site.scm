@@ -31,6 +31,7 @@
   #:export (site
             site?
             site-title
+            site-domain
             site-posts-directory
             site-build-directory
             site-default-metadata
@@ -39,10 +40,11 @@
             build-site))
 
 (define-record-type <site>
-  (make-site title posts-directory build-directory default-metadata
-             readers builders)
+  (make-site title domain posts-directory build-directory
+             default-metadata readers builders)
   site?
   (title site-title)
+  (domain site-domain)
   (posts-directory site-posts-directory)
   (build-directory site-build-directory)
   (default-metadata site-default-metadata)
@@ -51,6 +53,7 @@
 
 (define* (site #:key
                (title "This Place is Haunted")
+               (domain "example.com")
                (posts-directory "posts")
                (build-directory "site")
                (default-metadata '())
@@ -65,7 +68,7 @@ DEFAULT-METADATA: An alist of arbitrary default metadata for posts
 whose keys are symbols
 READERS: A list of reader objects for processing posts
 BUILDERS: A list of procedures for building pages from posts"
-  (make-site title posts-directory build-directory
+  (make-site title domain posts-directory build-directory
              default-metadata readers builders))
 
 (define (build-site site)
