@@ -23,6 +23,7 @@
 ;;; Code:
 
 (define-module (haunt post)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-19)
   #:use-module (haunt utils)
@@ -34,6 +35,7 @@
             post-ref
             post-slug
             posts/reverse-chronological
+            posts/group-by-tag
 
             register-metdata-parser!
             parse-metadata))
@@ -65,6 +67,19 @@
   (sort posts
         (lambda (a b)
           (time>? (post->time a) (post->time b)))))
+
+(define (posts/group-by-tag posts)
+  "Return an alist of tags mapped to the posts that used them."
+  (let ((table (make-hash-table)))
+    (for-each (lambda (post)
+                (for-each (lambda (tag)
+                            (let ((current (hash-ref table tag)))
+                              (if current
+                                  (hash-set! table tag (cons post current))
+                                  (hash-set! table tag (list post)))))
+                          (or (post-ref post 'tags) '())))
+              posts)
+    (hash-fold alist-cons '() table)))
 
 ;;;
 ;;; Metadata
