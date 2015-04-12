@@ -36,6 +36,7 @@
             clean-directory
             mkdir-p
             string->date*
+            take-up-to))
 
 (define* (flatten lst #:optional depth)
   "Return a list that recursively concatenates the sub-lists of LST,
@@ -105,3 +106,13 @@ flattened."
   "Convert STR, a string in '~Y~m~d ~H:~M' format, into a SRFI-19 date
 object."
   (string->date str "~Y~m~d ~H:~M"))
+
+(define (take-up-to n lst)
+  "Return the first N elements of LST or an equivalent list if there
+are fewer than N elements."
+  (if (zero? n)
+      '()
+      (match lst
+        (() '())
+        ((head . tail)
+         (cons head (take-up-to (1- n) tail))))))
