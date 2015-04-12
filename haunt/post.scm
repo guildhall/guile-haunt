@@ -25,6 +25,7 @@
 (define-module (haunt post)
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-19)
+  #:use-module (haunt utils)
   #:export (make-post
             post?
             post-file-name
@@ -32,7 +33,10 @@
             post-metadata
             post-ref
             post-slug
-            posts/reverse-chronological))
+            posts/reverse-chronological
+
+            register-metdata-parser!
+            parse-metadata))
 
 (define-record-type <post>
   (make-post file-name metadata sxml)
@@ -61,3 +65,26 @@
   (sort posts
         (lambda (a b)
           (time>? (post->time a) (post->time b)))))
+
+;;;
+;;; Metadata
+;;;
+
+(define %metadata-parsers
+  (make-hash-table))
+
+(define (metadata-parser key)
+  (or (hash-ref %metadata-parsers key) identity))
+
+(define (register-metadata-parser! name parser)
+  (hash-set! %metadata-parsers name parser))
+
+(define (parse-metadata key value)
+  ((metadata-parser key) value))
+
+(register-metadata-parser!
+ 'tags
+ (lambda (str)
+   (map string-trim-both (string-split str #\,))))
+
+(register-metadata-parser! 'date string->date*)
