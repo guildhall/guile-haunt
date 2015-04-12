@@ -1,6 +1,6 @@
 ;;; Haunt --- Static site generator for GNU Guile
 ;;; Copyright © 2015 David Thompson <davet@gnu.org>
-;;; Copyright © 2012 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2012, 2013, 2014 Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of Haunt.
 ;;;
@@ -33,7 +33,7 @@
             flat-map
             string-split-at
             absolute-file-name
-            clean-directory
+            delete-file-recursively
             mkdir-p
             string->date*
             take-up-to))
@@ -68,13 +68,31 @@ flattened."
       file-name
       (string-append (getcwd) "/" file-name)))
 
-(define (clean-directory dir)
-  (define (delete-other-files file-name stat flag)
-    (unless (string=? dir file-name)
-      (delete-file file-name))
-    #t)
+;; Written by Ludovic Courtès for GNU Guix.
+(define* (delete-file-recursively dir
+                                  #:key follow-mounts?)
+  "Delete DIR recursively, like `rm -rf', without following symlinks.  Don't
+follow mount points either, unless FOLLOW-MOUNTS? is true.  Report but ignore
+errors."
+  (let ((dev (stat:dev (lstat dir))))
+    (file-system-fold (lambda (dir stat result)    ; enter?
+                        (or follow-mounts?
+                            (= dev (stat:dev stat))))
+                      (lambda (file stat result)   ; leaf
+                        (delete-file file))
+                      (const #t)                   ; down
+                      (lambda (dir stat result)    ; up
+                        (rmdir dir))
+                      (const #t)                   ; skip
+                      (lambda (file stat errno result)
+                        (format (current-error-port)
+                                "warning: failed to delete ~a: ~a~%"
+                                file (strerror errno)))
+                      #t
+                      dir
 
-  (ftw dir delete-other-files))
+                      ;; Don't follow symlinks.
+                      lstat)))
 
 ;; Written by Ludovic Courtès for GNU Guix.
 (define (mkdir-p dir)

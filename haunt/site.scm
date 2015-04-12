@@ -77,7 +77,7 @@ BUILDERS: A list of procedures for building pages from posts"
                            (site-readers site)
                            (site-default-metadata site)))
         (build-dir (absolute-file-name (site-build-directory site))))
-    (clean-directory build-dir)
+    (delete-file-recursively build-dir)
     (for-each (lambda (page)
                 (format #t "writing '~a'~%" (page-file-name page))
                 (write-page page build-dir))
