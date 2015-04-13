@@ -59,14 +59,14 @@
                                   char-set:whitespace))
                "-"))
 
-(define (post->time post)
+(define (post-time post)
   (date->time-utc (post-ref post 'date)))
 
 (define (posts/reverse-chronological posts)
   "Returns POSTS sorted in reverse chronological order."
   (sort posts
         (lambda (a b)
-          (time>? (post->time a) (post->time b)))))
+          (time>? (post-time a) (post-time b)))))
 
 (define (posts/group-by-tag posts)
   "Return an alist of tags mapped to the posts that used them."
