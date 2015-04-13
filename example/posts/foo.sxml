@@ -1,0 +1,22 @@
+(use-modules (srfi srfi-41)
+             (haunt utils))
+
+(define fib
+  (stream-cons 0 (stream-cons 1 (stream-map + fib (stream-cdr fib)))))
+
+(define count 20)
+
+`((title . "Hello, world!")
+  (date . ,(string->date* "2015-04-10 23:00"))
+  (tags "foo" "bar")
+  (summary . "Just a test")
+  (content
+   ((h2 "What is this thing?")
+    (p "This is Haunt.  A static site generator for GNU Guile.")
+    (p "SXML is cool because you can evaluate Scheme code in your blog
+posts.  Here are the first "
+       ,count
+       " fibonacci numbers, computed with SRFI-41!")
+    (pre ,(object->string
+           (stream->list
+            (stream-take count fib)))))))
