@@ -29,10 +29,8 @@ Example Configuration
 (site #:title "Built with Guile"
       #:domain "dthompson.us"
       #:default-metadata
-      `((author . "David Thompson")
-        (email  . "davet@gnu.org")
-        ;; If I'm careless and forget a date, use the UNIX epoch.
-        (date   . ,(make-date 0 0 0 0 1 1 1970 0)))
+      '((author . "David Thompson")
+        (email  . "davet@gnu.org"))
       #:readers (list sxml-reader html-reader)
       #:builders (list (blog)
                        (atom-feed)

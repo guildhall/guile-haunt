@@ -34,6 +34,8 @@
             post-metadata
             post-ref
             post-slug
+            %default-date
+            post-date
             posts/reverse-chronological
             posts/group-by-tag
 
@@ -58,6 +60,14 @@
                     (string-split (string-downcase (post-ref post 'title))
                                   char-set:whitespace))
                "-"))
+
+(define %default-date
+  (make-date 0 0 0 0 1 1 1970 0)) ; UNIX epoch
+
+(define (post-date post)
+  "Return the date for POST, or '%default-date' if no date is
+specified."
+  (or (post-ref post 'date) %default-date))
 
 (define (post-time post)
   (date->time-utc (post-ref post 'date)))

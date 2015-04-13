@@ -51,7 +51,7 @@
      (name ,(post-ref post 'author))
      ,(let ((email (post-ref post 'email)))
         (if email `(email ,email) '())))
-    (updated ,(date->string* (post-ref post 'date)))
+    (updated ,(date->string* (post-date post)))
     (link (@ (href ,(string-append "/" (post-slug post) ".html"))
              (rel "alternate")))
     (summary (@ (type "html"))
