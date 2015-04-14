@@ -25,9 +25,11 @@
 (define-module (haunt site)
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-26)
+  #:use-module (ice-9 match)
   #:use-module (haunt utils)
   #:use-module (haunt reader)
   #:use-module (haunt page)
+  #:use-module (haunt asset)
   #:export (site
             site?
             site-title
@@ -77,8 +79,18 @@ BUILDERS: A list of procedures for building pages from posts"
                            (site-readers site)
                            (site-default-metadata site)))
         (build-dir (absolute-file-name (site-build-directory site))))
-    (delete-file-recursively build-dir)
-    (for-each (lambda (page)
-                (format #t "writing '~a'~%" (page-file-name page))
+    (when (file-exists? build-dir)
+      (delete-file-recursively build-dir)
+      (mkdir build-dir))
+    (for-each (match-lambda
+               ((? page? page)
+                (format #t "writing page '~a'~%" (page-file-name page))
                 (write-page page build-dir))
+               ((? asset? asset)
+                (format #t "copying asset '~a' -> '~a'~%"
+                        (asset-source asset)
+                        (asset-target asset))
+                (install-asset asset build-dir))
+               (obj
+                (error "unrecognized site object: " obj)))
               (flat-map (cut <> site posts) (site-builders site)))))

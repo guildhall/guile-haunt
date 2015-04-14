@@ -32,6 +32,8 @@
   #:export (flatten
             flat-map
             string-split-at
+            file-name-components
+            join-file-name-components
             absolute-file-name
             delete-file-recursively
             mkdir-p
@@ -62,6 +64,14 @@ flattened."
         (list (string-take str i)
               (string-drop str (1+ i)))
         (list str))))
+
+(define (file-name-components file-name)
+  "Split FILE-NAME into the components delimited by '/'."
+  (string-split file-name #\/))
+
+(define (join-file-name-components components)
+  "Join COMPONENTS into a file name string."
+  (string-join components "/"))
 
 (define (absolute-file-name file-name)
   (if (absolute-file-name? file-name)
