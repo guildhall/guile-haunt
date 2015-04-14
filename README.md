@@ -23,8 +23,7 @@ Example Configuration
 (use-modules (haunt site)
              (haunt reader)
              (haunt builder blog)
-             (haunt builder atom)
-             (srfi srfi-19))
+             (haunt builder atom))
 
 (site #:title "Built with Guile"
       #:domain "dthompson.us"
