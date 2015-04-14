@@ -5,10 +5,10 @@
              (srfi srfi-19))
 
 (site #:title "Built with Guile"
-      #:domain "dthompson.us"
+      #:domain "example.com"
       #:default-metadata
-      '((author . "David Thompson")
-        (email  . "davet@gnu.org"))
+      '((author . "Eva Luator")
+        (email  . "eva@example.com"))
       #:readers (list sxml-reader html-reader)
       #:builders (list (blog)
                        (atom-feed)
