@@ -23,25 +23,83 @@
 ;;; Code:
 
 (define-module (haunt builder blog)
+  #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-19)
   #:use-module (haunt site)
   #:use-module (haunt post)
   #:use-module (haunt page)
   #:use-module (haunt utils)
   #:use-module (haunt build html)
-  #:export (blog))
+  #:export (theme
+            theme?
+            theme-name
+            theme-layout
+            theme-post-template
+            theme-list-template
 
-(define (ugly-theme site post)
-  "Render POST on SITE with an unstyled, barebones theme."
-  `((doctype "html")
-    (head
-     (title ,(string-append (post-ref post 'title)
+            blog))
+
+(define-record-type <theme>
+  (make-theme name layout post-template list-template)
+  theme?
+  (name theme-name)
+  (layout theme-layout)
+  (post-template theme-post-template)
+  (list-template theme-list-template))
+
+(define* (theme #:key
+                (name "Untitled")
+                layout
+                post-template
+                list-template)
+  (make-theme name layout post-template list-template))
+
+(define (with-layout theme site title body)
+  ((theme-layout theme) site title body))
+
+(define (render-post theme site post)
+  (let ((title (post-ref post 'title))
+        (body ((theme-post-template theme) post)))
+    (with-layout theme site title body)))
+
+(define (render-list theme site title posts prefix)
+  (let ((body ((theme-list-template theme) title posts prefix)))
+    (with-layout theme site title body)))
+
+(define (date->string* date)
+  "Convert DATE to human readable string."
+  (date->string date "~a ~d ~B ~Y"))
+
+(define ugly-theme
+  (theme #:name "Ugly"
+         #:layout
+         (lambda (site title body)
+           `((doctype "html")
+             (head
+              (title ,(string-append title " — " (site-title site))))
+             (body
+              (h1 ,(site-title site))
+              ,body)))
+         #:post-template
+         (lambda (post)
+           `((h2 ,(post-ref post 'title))
+             (h3 "by " ,(post-ref post 'author)
+                 " — " ,(date->string* (post-date post)))
+             (div ,(post-sxml post))))
+         #:list-template
+         (lambda (title posts prefix)
+           (define (post-uri post)
+             (string-append "/" (or prefix "") (post-slug post) ".html"))
+
+           `((h3 ,title)
+             (ul
+              ,@(map (lambda (post)
+                       `(li
+                         (a (@ (href ,(post-uri post)))
+                            ,(post-ref post 'title)
                             " — "
-                            (site-title site))))
-    (body
-     (h1 ,(post-ref post 'title))
-     (h3 ,(post-ref post 'author))
-     (div ,(post-sxml post)))))
+                            ,(date->string* (post-date post)))))
+                     posts))))))
 
 (define* (blog #:key (theme ugly-theme) prefix)
   "Return a procedure that transforms a list of posts into pages
@@ -51,31 +109,18 @@ decorated by THEME, whose URLs start with PREFIX."
         (string-append prefix "/" base-name)
         base-name))
 
-  (define (post-uri post)
-    (string-append "/" (or prefix "") (post-slug post) ".html"))
-
-  (define (post->recent-post-entry post)
-    `(li
-      (a (@ (href ,(post-uri post)))
-         ,(post-ref post 'title))))
-
   (lambda (site posts)
     (define (post->page post)
       (let ((base-name (string-append (post-slug post) ".html")))
         (make-page (make-file-name base-name)
-                   (theme site post)
+                   (render-post theme site post)
                    sxml->html)))
 
     (define index-page
       (make-page (make-file-name "index.html")
-                 `((doctype "html")
-                   (head
-                    (title ,(site-title site)))
-                   (body
-                    (h1 ,(site-title site))
-                    (h3 "Recent Posts")
-                    (ul ,@(map post->recent-post-entry
-                               (posts/reverse-chronological posts)))))
+                 (render-list theme site "Recent Posts"
+                              (posts/reverse-chronological posts)
+                              prefix)
                  sxml->html))
 
     (cons index-page (map post->page posts))))
