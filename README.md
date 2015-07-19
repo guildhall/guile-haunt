@@ -45,6 +45,21 @@ directory named `posts`.  Then run `haunt build`!
 To view your creation, run `haunt serve` and browse to
 `localhost:8080`.
 
+Requirements
+------------
+
+GNU Guile >= 2.0.9
+
+Building
+--------
+
+Haunt uses the familiar GNU build system.  GNU automake, autoconf, and
+make are required to build from source.
+
+```
+./bootstrap && ./configure && make
+```
+
 License
 -------
 
