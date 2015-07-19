@@ -50,14 +50,21 @@ Requirements
 
 GNU Guile >= 2.0.9
 
-Building
---------
+Building from Git
+-----------------
 
 Haunt uses the familiar GNU build system.  GNU automake, autoconf, and
-make are required to build from source.
+make are required to build from a git checkout.
 
 ```
 ./bootstrap && ./configure && make
+```
+
+GNU Guix users can create a build environment with all necessary
+dependencies using the handy `guix environment` tool:
+
+```
+guix environment -l package.scm
 ```
 
 License
