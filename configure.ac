@@ -8,6 +8,7 @@ AM_SILENT_RULES([yes])
 
 AC_CONFIG_FILES([Makefile haunt/config.scm])
 AC_CONFIG_FILES([pre-inst-env], [chmod +x pre-inst-env])
+AC_CONFIG_FILES([scripts/haunt], [chmod +x scripts/haunt])
 
 GUILE_PROGS([2.0.11])
 

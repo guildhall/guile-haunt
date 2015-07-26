@@ -1,4 +1,4 @@
-#!/usr/bin/guile --no-auto-compile
+#!@GUILE@ --no-auto-compile
 -*- scheme -*-
 !#
 ;;; Haunt --- Static site generator for GNU Guile
