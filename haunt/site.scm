@@ -29,6 +29,7 @@
   #:use-module (haunt utils)
   #:use-module (haunt reader)
   #:use-module (haunt page)
+  #:use-module (haunt post)
   #:use-module (haunt asset)
   #:export (site
             site?
@@ -37,19 +38,22 @@
             site-posts-directory
             site-build-directory
             site-default-metadata
+            site-make-slug
             site-readers
             site-builders
+            site-post-slug
             build-site))
 
 (define-record-type <site>
   (make-site title domain posts-directory build-directory
-             default-metadata readers builders)
+             default-metadata make-slug readers builders)
   site?
   (title site-title)
   (domain site-domain)
   (posts-directory site-posts-directory)
   (build-directory site-build-directory)
   (default-metadata site-default-metadata)
+  (make-slug site-make-slug)
   (readers site-readers)
   (builders site-builders))
 
@@ -59,6 +63,7 @@
                (posts-directory "posts")
                (build-directory "site")
                (default-metadata '())
+               (make-slug post-slug)
                (readers '())
                (builders '()))
   "Create a new site object.  All arguments are optional:
@@ -68,10 +73,15 @@ POSTS-DIRECTORY: The directory where posts are found
 BUILD-DIRECTORY: The directory that generated pages are stored in
 DEFAULT-METADATA: An alist of arbitrary default metadata for posts
 whose keys are symbols
+POST-SLUG: A procedure generating a file name slug from a post
 READERS: A list of reader objects for processing posts
 BUILDERS: A list of procedures for building pages from posts"
   (make-site title domain posts-directory build-directory
-             default-metadata readers builders))
+             default-metadata make-slug readers builders))
+
+(define (site-post-slug site post)
+  "Return a slug string for POST using the slug generator for SITE."
+  ((site-make-slug site) post))
 
 (define (build-site site)
   "Build SITE in the appropriate build directory."

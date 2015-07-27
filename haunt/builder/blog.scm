@@ -63,7 +63,7 @@
     (with-layout theme site title body)))
 
 (define (render-list theme site title posts prefix)
-  (let ((body ((theme-list-template theme) title posts prefix)))
+  (let ((body ((theme-list-template theme) site title posts prefix)))
     (with-layout theme site title body)))
 
 (define (date->string* date)
@@ -88,9 +88,10 @@
                  " — " ,(date->string* (post-date post)))
              (div ,(post-sxml post))))
          #:list-template
-         (lambda (title posts prefix)
+         (lambda (site title posts prefix)
            (define (post-uri post)
-             (string-append "/" (or prefix "") (post-slug post) ".html"))
+             (string-append "/" (or prefix "")
+                            (site-post-slug site post) ".html"))
 
            `((h3 ,title)
              (ul
@@ -112,7 +113,8 @@ decorated by THEME, whose URLs start with PREFIX."
 
   (lambda (site posts)
     (define (post->page post)
-      (let ((base-name (string-append (post-slug post) ".html")))
+      (let ((base-name (string-append (site-post-slug site post)
+                                      ".html")))
         (make-page (make-file-name base-name)
                    (render-post theme site post)
                    sxml->html)))

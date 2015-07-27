@@ -24,6 +24,7 @@
 
 (define-module (haunt builder atom)
   #:use-module (srfi srfi-19)
+  #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
   #:use-module (sxml simple)
   #:use-module (haunt site)
@@ -43,7 +44,7 @@
   "Convert date to ISO-8601 formatted string."
   (date->string date "~4"))
 
-(define (post->atom-entry post)
+(define (post->atom-entry site post)
   "Convert POST into an Atom <entry> XML node."
   `(entry
     (title ,(post-ref post 'title))
@@ -52,7 +53,7 @@
      ,(let ((email (post-ref post 'email)))
         (if email `(email ,email) '())))
     (updated ,(date->string* (post-date post)))
-    (link (@ (href ,(string-append "/" (post-slug post) ".html"))
+    (link (@ (href ,(string-append "/" (site-post-slug site post) ".html"))
              (rel "alternate")))
     (summary (@ (type "html"))
              ,(sxml->html-string (post-sxml post)))))
@@ -78,7 +79,7 @@ MAX-ENTRIES: The maximum number of posts to render in the feed"
                       (link (@ (href ,(string-append "/" file-name))
                                (rel "self")))
                       (link (@ (href ,(site-domain site))))
-                      ,@(map post->atom-entry
+                      ,@(map (cut post->atom-entry site <>)
                              (take-up-to max-entries (filter posts))))
                sxml->xml*)))
 
