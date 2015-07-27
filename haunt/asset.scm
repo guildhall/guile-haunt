@@ -35,6 +35,11 @@
             install-asset
             directory-assets))
 
+;; Assets are static files that are copied verbatim from a site's
+;; source directory to the target output directory, such as images,
+;; CSS, and JavaScript files.  The 'source' and 'target' fields are
+;; file names that are relative to a source and target directory,
+;; respectively.
 (define-record-type <asset>
   (make-asset source target)
   asset?

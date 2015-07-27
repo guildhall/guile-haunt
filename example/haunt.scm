@@ -1,5 +1,6 @@
 (use-modules (haunt site)
              (haunt reader)
+             (haunt asset)
              (haunt builder blog)
              (haunt builder atom)
              (srfi srfi-19))

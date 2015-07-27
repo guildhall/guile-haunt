@@ -23,7 +23,8 @@ Example Configuration
 (use-modules (haunt site)
              (haunt reader)
              (haunt builder blog)
-             (haunt builder atom))
+             (haunt builder atom)
+             (haunt builder assets))
 
 (site #:title "Built with Guile"
       #:domain "example.com"
@@ -33,7 +34,8 @@ Example Configuration
       #:readers (list sxml-reader html-reader)
       #:builders (list (blog)
                        (atom-feed)
-                       (atom-feeds-by-tag)))
+                       (atom-feeds-by-tag)
+                       (static-directory "images"))
 ```
 
 Usage
