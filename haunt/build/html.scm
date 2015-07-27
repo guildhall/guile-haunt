@@ -113,7 +113,7 @@ list ATTRS and the child nodes in BODY."
     (() *unspecified*)
     (('doctype type)
      (doctype->html type port))
-    ;; Unescaped, raw HTML output
+    ;; Unescaped, raw HTML output.
     (('raw html)
      (display html port))
     (((? symbol? tag) ('@ attrs ...) body ...)
