@@ -76,6 +76,7 @@
          (lambda (site title body)
            `((doctype "html")
              (head
+              (meta (@ (charset "utf-8")))
               (title ,(string-append title " — " (site-title site))))
              (body
               (h1 ,(site-title site))
