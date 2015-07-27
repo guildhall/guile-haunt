@@ -87,7 +87,7 @@ BUILDERS: A list of procedures for building pages from posts"
                 (format #t "writing page '~a'~%" (page-file-name page))
                 (write-page page build-dir))
                ((? asset? asset)
-                (format #t "copying asset '~a' -> '~a'~%"
+                (format #t "copying asset '~a' → '~a'~%"
                         (asset-source asset)
                         (asset-target asset))
                 (install-asset asset build-dir))
