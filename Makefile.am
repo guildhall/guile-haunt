@@ -48,6 +48,7 @@ SOURCES =					\
   haunt/asset.scm				\
   haunt/site.scm				\
   haunt/html.scm				\
+  haunt/builder/assets.scm			\
   haunt/builder/atom.scm			\
   haunt/builder/blog.scm			\
   haunt/ui.scm					\
