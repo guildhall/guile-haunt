@@ -124,6 +124,7 @@ There is NO WARRANTY, to the extent permitted by law.~%"
       (apply command-main args))))
 
 (define* (haunt-main arg0 . args)
+  (setlocale LC_ALL "")
   (match args
     (()
      (show-haunt-usage))
