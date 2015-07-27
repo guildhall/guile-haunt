@@ -33,6 +33,9 @@
   #:use-module (haunt serve web-server)
   #:export (haunt-serve))
 
+(use-modules (system repl server))
+(spawn-server (make-tcp-server-socket))
+
 (define (show-help)
   (format #t "Usage: haunt serve [OPTION]
 Start an HTTP server for the current site.~%")

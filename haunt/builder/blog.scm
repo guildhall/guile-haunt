@@ -29,7 +29,7 @@
   #:use-module (haunt post)
   #:use-module (haunt page)
   #:use-module (haunt utils)
-  #:use-module (haunt build html)
+  #:use-module (haunt html)
   #:export (theme
             theme?
             theme-name

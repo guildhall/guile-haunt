@@ -22,7 +22,7 @@
 ;;
 ;;; Code:
 
-(define-module (haunt build html)
+(define-module (haunt html)
   #:use-module (sxml simple)
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
