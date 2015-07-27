@@ -3,6 +3,7 @@
              (haunt asset)
              (haunt builder blog)
              (haunt builder atom)
+             (haunt builder assets)
              (srfi srfi-19))
 
 (site #:title "Built with Guile"
@@ -13,4 +14,5 @@
       #:readers (list sxml-reader html-reader)
       #:builders (list (blog)
                        (atom-feed)
-                       (atom-feeds-by-tag)))
+                       (atom-feeds-by-tag)
+                       (static-directory "images")))

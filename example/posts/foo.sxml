@@ -1,3 +1,5 @@
+;;; -*- scheme -*-
+
 (use-modules (srfi srfi-41)
              (haunt utils))
 
@@ -19,4 +21,6 @@ posts.  Here are the first "
        " fibonacci numbers, computed with SRFI-41!")
     (pre ,(object->string
            (stream->list
-            (stream-take count fib)))))))
+            (stream-take count fib))))
+    (p "Guile Scheme is great, eh?")
+    (img (@ (src "/images/guile-banner.small.png"))))))
