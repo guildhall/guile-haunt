@@ -67,7 +67,9 @@ flattened."
 
 (define (file-name-components file-name)
   "Split FILE-NAME into the components delimited by '/'."
-  (string-split file-name #\/))
+  (if (string-null? file-name)
+      '()
+      (string-split file-name #\/)))
 
 (define (join-file-name-components components)
   "Join COMPONENTS into a file name string."
