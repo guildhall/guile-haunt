@@ -28,6 +28,7 @@
   #:use-module (ice-9 match)
   #:use-module (ice-9 popen)
   #:use-module (ice-9 rdelim)
+  #:use-module (ice-9 binary-ports)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:use-module (sxml simple)
@@ -90,21 +91,11 @@ Otherwise, return FILE-NAME as-is."
      ((file-exists? file-name) file-name)
      (else #f))))
 
-(define (dump-file file-name port)
-  "Write the contents of FILE-NAME to PORT."
-  (with-input-from-file file-name
-    (lambda ()
-      (let loop ((char (read-char)))
-        (unless (eof-object? char)
-          (write-char char port)
-          (loop (read-char)))))))
-
 (define (render-file file-name)
   "Return a 200 OK HTTP response that renders the contents of
 FILE-NAME."
   (values `((content-type . (,(mime-type file-name))))
-          (lambda (port)
-            (dump-file file-name port))))
+          (call-with-input-file file-name get-bytevector-all)))
 
 (define (render-directory path dir)
   "Render the contents of DIR represented by the URI PATH."
