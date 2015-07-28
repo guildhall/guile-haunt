@@ -73,7 +73,7 @@ POSTS-DIRECTORY: The directory where posts are found
 BUILD-DIRECTORY: The directory that generated pages are stored in
 DEFAULT-METADATA: An alist of arbitrary default metadata for posts
 whose keys are symbols
-POST-SLUG: A procedure generating a file name slug from a post
+MAKE-SLUG: A procedure generating a file name slug from a post
 READERS: A list of reader objects for processing posts
 BUILDERS: A list of procedures for building pages from posts"
   (make-site title domain posts-directory build-directory
