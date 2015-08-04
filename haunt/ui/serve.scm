@@ -27,6 +27,7 @@
   #:use-module (srfi srfi-37)
   #:use-module (ice-9 match)
   #:use-module (ice-9 format)
+  #:use-module (ice-9 ftw)
   #:use-module (haunt site)
   #:use-module (haunt config)
   #:use-module (haunt ui)
@@ -38,6 +39,8 @@
 Start an HTTP server for the current site.~%")
   (display "
   -p, --port             port to listen on")
+  (display "
+  -w, --watch            rebuild site when files change")
   (newline)
   (show-common-options-help)
   (newline)
@@ -58,16 +61,59 @@ Start an HTTP server for the current site.~%")
          (option '(#\p "port") #t #f
                  (lambda (opt name arg result)
                    (alist-cons 'port (string->number* arg) result)))
+         (option '(#\w "watch") #f #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'watch? #t result)))
          %common-options))
 
 (define %default-options
   (cons '(port . 8080)
         %default-common-options))
 
+;; XXX: Make this less naive.
+(define (watch config-file ignore-dirs)
+  "Watch the current working directory for changes to any of its files
+sans the files within IGNORE-DIRS, a list of subdirectories.  When a
+file has been changed, reload CONFIG-FILE and rebuild the site."
+  (define (any-files-changed? time)
+    (define (enter? name stat result)
+      (cond
+       ;; Don't bother descending if we already know that a file has
+       ;; changed.
+       (result #f)
+       ;; Skip ignored directories, such as the site build directory.
+       ((any (lambda (dir) (string-prefix? dir name)) ignore-dirs)
+        #f)
+       (else #t)))
+
+    (define (leaf name stat result)
+      ;; Test if file has been modified since the last time we
+      ;; checked.
+      (>= (stat:mtime stat) time))
+
+    (define (no-op name stat result) result)
+
+    (file-system-fold enter? leaf no-op no-op no-op no-op #f (getcwd)))
+
+  (let loop ((time (current-time)))
+    (sleep 1)
+    (when (any-files-changed? time)
+      (display "rebuilding...\n")
+      (build-site (load-config config-file)))
+    (loop (current-time))))
+
 (define (haunt-serve . args)
-  (let* ((opts (simple-args-fold args %options %default-options))
-         (port (assq-ref opts 'port))
-         (site (load-config (assq-ref opts 'config)))
+  (let* ((opts     (simple-args-fold args %options %default-options))
+         (port     (assq-ref opts 'port))
+         (watch?   (assq-ref opts 'watch?))
+         (config   (assq-ref opts 'config))
+         (site     (load-config config))
          (doc-root (site-build-directory site)))
     (format #t "serving ~a on port ~d~%" doc-root port)
+
+    (when watch?
+      (call-with-new-thread
+       (lambda ()
+         (watch config (list (site-build-directory site))))))
+
     (serve doc-root)))
