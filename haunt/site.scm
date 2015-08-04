@@ -23,9 +23,11 @@
 ;;; Code:
 
 (define-module (haunt site)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
+  #:use-module (ice-9 regex)
   #:use-module (haunt utils)
   #:use-module (haunt reader)
   #:use-module (haunt page)
@@ -36,21 +38,26 @@
             site-title
             site-domain
             site-posts-directory
+            site-post-filter
             site-build-directory
             site-default-metadata
             site-make-slug
             site-readers
             site-builders
             site-post-slug
-            build-site))
+            build-site
+
+            make-file-name-filter
+            default-file-name-filter))
 
 (define-record-type <site>
-  (make-site title domain posts-directory build-directory
+  (make-site title domain posts-directory post-filter build-directory
              default-metadata make-slug readers builders)
   site?
   (title site-title)
   (domain site-domain)
   (posts-directory site-posts-directory)
+  (post-filter site-post-filter)
   (build-directory site-build-directory)
   (default-metadata site-default-metadata)
   (make-slug site-make-slug)
@@ -61,6 +68,7 @@
                (title "This Place is Haunted")
                (domain "example.com")
                (posts-directory "posts")
+               (post-filter default-file-name-filter)
                (build-directory "site")
                (default-metadata '())
                (make-slug post-slug)
@@ -70,13 +78,15 @@
 
 TITLE: The name of the site
 POSTS-DIRECTORY: The directory where posts are found
+POST-FILTER: A predicate procedure that returns #t when a post file
+should be ignored (ignores Emacs temp files by default)
 BUILD-DIRECTORY: The directory that generated pages are stored in
 DEFAULT-METADATA: An alist of arbitrary default metadata for posts
 whose keys are symbols
 MAKE-SLUG: A procedure generating a file name slug from a post
 READERS: A list of reader objects for processing posts
 BUILDERS: A list of procedures for building pages from posts"
-  (make-site title domain posts-directory build-directory
+  (make-site title domain posts-directory post-filter build-directory
              default-metadata make-slug readers builders))
 
 (define (site-post-slug site post)
@@ -86,6 +96,7 @@ BUILDERS: A list of procedures for building pages from posts"
 (define (build-site site)
   "Build SITE in the appropriate build directory."
   (let ((posts (read-posts (site-posts-directory site)
+                           (site-post-filter site)
                            (site-readers site)
                            (site-default-metadata site)))
         (build-dir (absolute-file-name (site-build-directory site))))
@@ -104,3 +115,15 @@ BUILDERS: A list of procedures for building pages from posts"
                (obj
                 (error "unrecognized site object: " obj)))
               (flat-map (cut <> site posts) (site-builders site)))))
+
+(define (make-file-name-filter patterns)
+  (let ((patterns (map make-regexp patterns)))
+    (lambda (file-name)
+      (any (lambda (regexp)
+             (regexp-match?
+              (regexp-exec regexp (basename file-name))))
+           patterns))))
+
+;; Filter out Emacs temporary files by default.
+(define default-file-name-filter
+  (make-file-name-filter '("^\\.#")))

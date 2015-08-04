@@ -63,16 +63,19 @@ metadata with DEFAULT-METADATA."
                (append metadata default-metadata)
                sxml)))
 
-(define* (read-posts directory readers #:optional (default-metadata '()))
-  "Read all of the files in DIRECTORY as post objects.  The READERS
-list must contain a matching reader for every post."
+(define* (read-posts directory ignore? readers #:optional (default-metadata '()))
+  "Read all of the files in DIRECTORY that do not match IGNORE? as
+post objects.  The READERS list must contain a matching reader for
+every post."
   (define enter? (const #t))
 
   (define (leaf file-name stat memo)
-    (let ((reader (find (cut reader-match? <> file-name) readers)))
-      (if reader
-          (cons (read-post reader file-name default-metadata) memo)
-          (error "no reader available for post: " file-name))))
+    (if (ignore? file-name)
+        memo
+        (let ((reader (find (cut reader-match? <> file-name) readers)))
+          (if reader
+              (cons (read-post reader file-name default-metadata) memo)
+              (error "no reader available for post: " file-name)))))
 
   (define (noop file-name stat result)
     result)
