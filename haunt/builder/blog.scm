@@ -37,6 +37,8 @@
             theme-post-template
             theme-list-template
 
+            date->string*
+
             blog))
 
 (define-record-type <theme>
