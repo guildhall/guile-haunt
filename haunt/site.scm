@@ -95,10 +95,12 @@ BUILDERS: A list of procedures for building pages from posts"
 
 (define (build-site site)
   "Build SITE in the appropriate build directory."
-  (let ((posts (read-posts (site-posts-directory site)
-                           (site-post-filter site)
-                           (site-readers site)
-                           (site-default-metadata site)))
+  (let ((posts (if (file-exists? (site-posts-directory site))
+                   (read-posts (site-posts-directory site)
+                               (site-post-filter site)
+                               (site-readers site)
+                               (site-default-metadata site))
+                   '()))
         (build-dir (absolute-file-name (site-build-directory site))))
     (when (file-exists? build-dir)
       (delete-file-recursively build-dir)
