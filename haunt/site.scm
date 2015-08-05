@@ -126,4 +126,4 @@ BUILDERS: A list of procedures for building pages from posts"
 
 ;; Filter out Emacs temporary files by default.
 (define default-file-name-filter
-  (make-file-name-filter '("^\\.#")))
+  (make-file-name-filter '("^\\." "^#")))
