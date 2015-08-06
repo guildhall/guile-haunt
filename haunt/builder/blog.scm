@@ -23,6 +23,7 @@
 ;;; Code:
 
 (define-module (haunt builder blog)
+  #:use-module (ice-9 match)
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-19)
   #:use-module (haunt site)
@@ -42,19 +43,19 @@
             blog))
 
 (define-record-type <theme>
-  (make-theme name layout post-template list-template)
+  (make-theme name layout post-template collection-template)
   theme?
   (name theme-name)
   (layout theme-layout)
   (post-template theme-post-template)
-  (list-template theme-list-template))
+  (collection-template theme-collection-template))
 
 (define* (theme #:key
                 (name "Untitled")
                 layout
                 post-template
-                list-template)
-  (make-theme name layout post-template list-template))
+                collection-template)
+  (make-theme name layout post-template collection-template))
 
 (define (with-layout theme site title body)
   ((theme-layout theme) site title body))
@@ -64,8 +65,8 @@
         (body ((theme-post-template theme) post)))
     (with-layout theme site title body)))
 
-(define (render-list theme site title posts prefix)
-  (let ((body ((theme-list-template theme) site title posts prefix)))
+(define (render-collection theme site title posts prefix)
+  (let ((body ((theme-collection-template theme) site title posts prefix)))
     (with-layout theme site title body)))
 
 (define (date->string* date)
@@ -89,7 +90,7 @@
              (h3 "by " ,(post-ref post 'author)
                  " — " ,(date->string* (post-date post)))
              (div ,(post-sxml post))))
-         #:list-template
+         #:collection-template
          (lambda (site title posts prefix)
            (define (post-uri post)
              (string-append "/" (or prefix "")
@@ -105,7 +106,9 @@
                             ,(date->string* (post-date post)))))
                      posts))))))
 
-(define* (blog #:key (theme ugly-theme) prefix)
+(define* (blog #:key (theme ugly-theme) prefix
+               (collections
+                `(("Recent Posts" "index.html" ,posts/reverse-chronological))))
   "Return a procedure that transforms a list of posts into pages
 decorated by THEME, whose URLs start with PREFIX."
   (define (make-file-name base-name)
@@ -121,11 +124,12 @@ decorated by THEME, whose URLs start with PREFIX."
                    (render-post theme site post)
                    sxml->html)))
 
-    (define index-page
-      (make-page (make-file-name "index.html")
-                 (render-list theme site "Recent Posts"
-                              (posts/reverse-chronological posts)
-                              prefix)
-                 sxml->html))
+    (define collection->page
+      (match-lambda
+       ((title file-name filter)
+        (make-page (make-file-name file-name)
+                   (render-collection theme site title (filter posts) prefix)
+                   sxml->html))))
 
-    (cons index-page (map post->page posts))))
+    (append (map post->page posts)
+            (map collection->page collections))))
