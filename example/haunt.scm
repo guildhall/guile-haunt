@@ -3,8 +3,7 @@
              (haunt asset)
              (haunt builder blog)
              (haunt builder atom)
-             (haunt builder assets)
-             (srfi srfi-19))
+             (haunt builder assets))
 
 (site #:title "Built with Guile"
       #:domain "example.com"
