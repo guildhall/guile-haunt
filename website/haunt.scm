@@ -32,7 +32,7 @@
              (web uri))
 
 (define %releases
-  '(("0.1" "1f751f234e382ed0f13d79e4c106373e9ae55c23")))
+  '(("0.1" "c81dbcdf33f9b0a19442d3701cffa3b60c8891ce")))
 
 (define (tarball-url version)
   (string-append "http://files.dthompson.us/haunt/haunt-"
