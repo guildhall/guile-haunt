@@ -71,36 +71,39 @@ Start an HTTP server for the current site.~%")
         %default-common-options))
 
 ;; XXX: Make this less naive.
-(define (watch config-file ignore-dirs)
+(define (watch config-file check-dir? check-file?)
   "Watch the current working directory for changes to any of its files
-sans the files within IGNORE-DIRS, a list of subdirectories.  When a
-file has been changed, reload CONFIG-FILE and rebuild the site."
+that match CHECK-FILE? and any subdirectories that match CHECK-DIR?.
+When a file has been changed, reload CONFIG-FILE and rebuild the
+site."
+
+  (define cwd (getcwd))
+
   (define (any-files-changed? time)
     (define (enter? name stat result)
-      (cond
-       ;; Don't bother descending if we already know that a file has
-       ;; changed.
-       (result #f)
-       ;; Skip ignored directories, such as the site build directory.
-       ((any (lambda (dir) (string-prefix? dir name)) ignore-dirs)
-        #f)
-       (else #t)))
+      ;; Don't bother descending if we already know that a file has
+      ;; changed.
+      (and (not result) (check-dir? name)))
 
     (define (leaf name stat result)
       ;; Test if file has been modified since the last time we
       ;; checked.
-      (>= (stat:mtime stat) time))
+      (or result
+          (and (check-file? name)
+               (or (>= (stat:mtime stat) time)
+                   (>= (stat:ctime stat) time)))))
 
     (define (no-op name stat result) result)
 
-    (file-system-fold enter? leaf no-op no-op no-op no-op #f (getcwd)))
+    (file-system-fold enter? leaf no-op no-op no-op no-op #f cwd))
 
   (let loop ((time (current-time)))
-    (sleep 1)
     (when (any-files-changed? time)
       (display "rebuilding...\n")
       (build-site (load-config config-file)))
-    (loop (current-time))))
+    (let ((next-time (current-time)))
+      (sleep 1)
+      (loop next-time))))
 
 (define (haunt-serve . args)
   (let* ((opts     (simple-args-fold args %options %default-options))
@@ -114,6 +117,12 @@ file has been changed, reload CONFIG-FILE and rebuild the site."
     (when watch?
       (call-with-new-thread
        (lambda ()
-         (watch config (list (site-build-directory site))))))
+         (watch config
+                (let ((cwd       (getcwd))
+                      (build-dir (site-build-directory site)))
+                  (lambda (dir)
+                    (not
+                     (string-prefix? (string-append cwd "/" build-dir) dir))))
+                (site-file-filter site)))))
 
     (serve doc-root)))
