@@ -39,9 +39,9 @@
      ("automake" ,automake)))
   (inputs
    `(("guile" ,guile-2.0)))
-  (synopsis "Functional, composable static site generator")
+  (synopsis "Functional static site generator")
   (description "Haunt is a static site generator written in Guile
 Scheme.  Haunt features a functional build system and an extensible
-interface for reading site content in any format.")
-  (home-page "https://git.dthompson.us/haunt.git")
+interface for reading articles in any format.")
+  (home-page "http://haunt.dthompson.us")
   (license gpl3+))
