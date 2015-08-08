@@ -1,0 +1,41 @@
+;;; -*- scheme -*-
+
+(use-modules  (haunt utils))
+
+`((title . "Introducing Haunt")
+  (date . ,(string->date* "2015-08-08 10:00"))
+  (tags "news" "releases")
+  (summary . "Haunt 0.1 released")
+  (content
+   ((p "I am pleased to announce the first alpha release of Haunt, yet
+another static site generator.  Does the world really need another one
+of those?  No, but Haunt is special because it is written in Guile
+Scheme, a clean and elegant Lisp dialect, which allows users to
+compose their websites using functional programming techniques.  Using
+a general-purpose, extensible programming language to build websites
+allows Haunt users to view their website as not just mere data, but a
+program.  Haunt empowers the user to build the abstractions they need
+to make a great static website without getting in the way.")
+    (p "At its core, Haunt is a very simple program.  To build your
+site, Haunt takes your posts and static assets as input, passes them
+to a series of user-defined building procedures that return one or
+more pages, and outputs all of the generated pages to the file system.
+That's all there is to it.  All of the \"good stuff\" is implemented
+in the builder procedures.  Haunt 0.1 comes with simple blog and Atom
+feed generators.")
+    (p "Naturally, this website is built with Haunt.  You can see its
+complete source code in the "
+       (code "website") " directory in Haunt's "
+       (a (@ (href "https://git.dthompson.us/haunt.git/tree/HEAD:/website"))
+          "official git repository")
+       ".")
+    (p "The Haunt 0.1 release tarball URL can be found on the "
+       (a (@ (href "/downloads.html")) "downloads page")
+       ".")
+    (p "Haunt is built to be as hackable as possible, and patches to
+improve it are very much welcome.  In particular, new post readers for
+common formats such as org-mode and Markdown are desired, along with a
+more robust blog builder and theme engine.  In lieu of a mailing list,
+patches may be sent to "
+       (code "davet") " at " (code "gnu.org") ".")
+    (p "Happy haunting!"))))
