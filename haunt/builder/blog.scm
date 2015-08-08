@@ -37,6 +37,7 @@
             theme-layout
             theme-post-template
             theme-list-template
+            with-layout
 
             date->string*
 
