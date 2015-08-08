@@ -55,9 +55,9 @@ PREFIX."
        (mkdir-p (dirname target*))
        (copy-file source target*)))))
 
-(define (directory-assets directory dest)
+(define (directory-assets directory keep? dest)
   "Create a list of asset objects to be stored within DEST for all
-files in DIRECTORY, recursively."
+files in DIRECTORY that match KEEP?, recursively."
   (define enter? (const #t))
 
   ;; In order to do accurate file name manipulation, every file name
@@ -67,10 +67,12 @@ files in DIRECTORY, recursively."
     (let ((base-length (length (file-name-components directory)))
           (dest* (file-name-components dest)))
       (lambda (file-name stat memo)
-        (let* ((file-name* (file-name-components file-name))
-               (target (join-file-name-components
-                        (append dest* (drop file-name* base-length)))))
-          (cons (make-asset file-name target) memo)))))
+        (if (keep? file-name)
+            (let* ((file-name* (file-name-components file-name))
+                   (target (join-file-name-components
+                            (append dest* (drop file-name* base-length)))))
+              (cons (make-asset file-name target) memo))
+            memo))))
 
   (define (noop file-name stat memo) memo)
 

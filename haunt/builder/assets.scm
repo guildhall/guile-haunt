@@ -28,6 +28,7 @@
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
   #:use-module (haunt asset)
+  #:use-module (haunt site)
   #:export (static-directory))
 
 (define* (static-directory directory #:optional (dest directory))
@@ -35,5 +36,5 @@
 in DIRECTORY, a file names relative to a site's source directory, and
 copies them into DEST, a prefix relative to a site's target output
 directory.  By default, DEST is DIRECTORY."
-  (lambda _
-    (directory-assets directory dest)))
+  (lambda (site posts)
+    (directory-assets directory (site-file-filter site) dest)))
