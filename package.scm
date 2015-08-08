@@ -18,12 +18,19 @@
 
 ;;; Commentary:
 ;;
-;; Development environment for GNU Guix.
+;; GNU Guix development package.  To build and install, run:
+;;
+;;   guix package -e '(primitive-load "package.scm")'
+;;
+;; To use as the basis for a development environment, run:
+;;
+;;   guix environment -l package.scm
 ;;
 ;;; Code:
 
 (use-modules (guix packages)
              (guix licenses)
+             (guix git-download)
              (guix build-system gnu)
              (gnu packages)
              (gnu packages autotools)
@@ -31,9 +38,21 @@
 
 (package
   (name "haunt")
-  (version "0.0")
-  (source #f)
+  (version "0.1")
+  (source (origin
+            (method git-fetch)
+            (uri (git-reference
+                  (url "git://dthompson.us/haunt.git")
+                  (commit "f012747")))
+            (sha256
+             (base32
+              "0gj4xw79g3q87m6js0mbvv437zf7df5d2xg4sx65mpgc85j7zafs"))))
   (build-system gnu-build-system)
+  (arguments
+   '(#:phases
+     (modify-phases %standard-phases
+       (add-after 'unpack 'bootstrap
+         (lambda _ (zero? (system* "sh" "bootstrap")))))))
   (native-inputs
    `(("autoconf" ,autoconf)
      ("automake" ,automake)))
