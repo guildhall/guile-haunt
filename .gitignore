@@ -13,3 +13,4 @@
 /haunt/config.scm
 /example/site/
 /scripts/haunt
+*.tar.gz
