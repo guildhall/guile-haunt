@@ -50,7 +50,7 @@ To view your creation, run `haunt serve` and browse to
 Requirements
 ------------
 
-GNU Guile >= 2.0.9
+GNU Guile >= 2.0.11
 
 Building from Git
 -----------------
