@@ -68,6 +68,13 @@
   '(a (@ (href "https://creativecommons.org/licenses/by-sa/4.0/"))
       "Creative Commons Attribution Share-Alike 4.0 International"))
 
+(define %piwik-code
+  '((script (@ (type "text/javascript") (src "/js/piwik.js")))
+    (noscript
+     (p (img (@ (src "//stats.dthompson.us/piwik.php?idsite=3")
+                (style "border:0;")
+                (alt "")))))))
+
 (define haunt-theme
   (theme #:name "Haunt"
          #:layout
@@ -77,7 +84,8 @@
               (meta (@ (charset "utf-8")))
               (title ,(string-append title " — " (site-title site)))
               ,(stylesheet "reset")
-              ,(stylesheet "main"))
+              ,(stylesheet "main")
+              ,%piwik-code)
              (body
               (header (@ (class "navbar"))
                       (div (@ (class "container"))
@@ -200,4 +208,5 @@ the official git repository:")
                        (atom-feeds-by-tag)
                        downloads-page
                        (static-directory "images")
-                       (static-directory "css")))
+                       (static-directory "css")
+                       (static-directory "js")))
