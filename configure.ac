@@ -6,7 +6,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([color-tests -Wall -Wno-portability foreign])
 AM_SILENT_RULES([yes])
 
-AC_CONFIG_FILES([Makefile haunt/config.scm])
+AC_CONFIG_FILES([Makefile example/Makefile website/Makefile haunt/config.scm])
 AC_CONFIG_FILES([pre-inst-env], [chmod +x pre-inst-env])
 AC_CONFIG_FILES([scripts/haunt], [chmod +x scripts/haunt])
 

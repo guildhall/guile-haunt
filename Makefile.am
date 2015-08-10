@@ -63,3 +63,7 @@ SOURCES =					\
 EXTRA_DIST +=					\
   pre-inst-env.in				\
   README.md
+
+SUBDIRS =					\
+  example					\
+  website
