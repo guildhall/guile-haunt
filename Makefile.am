@@ -60,4 +60,6 @@ SOURCES =					\
   haunt/serve/mime-types.scm			\
   haunt/serve/web-server.scm
 
-EXTRA_DIST += pre-inst-env.in
+EXTRA_DIST +=					\
+  pre-inst-env.in				\
+  README.md
