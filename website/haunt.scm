@@ -161,6 +161,15 @@ without needing to upload the generated files to a web server.")
                             ,(date->string* (post-date post)))))
                      (posts/reverse-chronological posts)))
 
+             (h2 "License")
+             (p "Haunt is "
+                (a (@ (href "https://www.gnu.org/philosophy/free-sw.html"))
+                   "Free Software")
+                " available under the "
+                (a (@ (href "https://www.gnu.org/licenses/gpl.html"))
+                   "GNU General Public License")
+                " version 3 or later.")
+
              (h2 "Contributing")
              (p "Patches to fix bugs or add new functionality are
 highly encouraged.  In lieu of a mailing list, please send patches
