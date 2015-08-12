@@ -62,7 +62,8 @@ SOURCES =					\
 
 EXTRA_DIST +=					\
   pre-inst-env.in				\
-  README.md
+  README.md					\
+  package.scm
 
 SUBDIRS =					\
   example					\
