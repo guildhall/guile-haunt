@@ -76,6 +76,16 @@ dependencies using the handy `guix environment` tool:
 guix environment -l package.scm
 ```
 
+Examples
+--------
+
+An example Haunt site can be found in the `example` directory:
+
+```
+cd example
+../pre-inst-env haunt build
+```
+
 License
 -------
 
