@@ -62,6 +62,13 @@ make are required to build from a git checkout.
 ./bootstrap && ./configure && make
 ```
 
+Once Haunt is built, it can be run directly from the source tree (no
+need to run `make install`) via the `pre-inst-env` script:
+
+```
+./pre-inst-env haunt --help
+```
+
 GNU Guix users can create a build environment with all necessary
 dependencies using the handy `guix environment` tool:
 
