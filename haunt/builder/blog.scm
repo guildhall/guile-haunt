@@ -36,7 +36,7 @@
             theme-name
             theme-layout
             theme-post-template
-            theme-list-template
+            theme-collection-template
             with-layout
 
             date->string*
